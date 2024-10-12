@@ -2,9 +2,6 @@ import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
 import { useState, useRef } from 'react';
-import { past, allPastStates } from 'react'
-import { currentState } from 'react'
-import { future, anyAndAllFutureStates } from 'react'
 
 function App() {
   const [color, setColor] = useState("pink");
