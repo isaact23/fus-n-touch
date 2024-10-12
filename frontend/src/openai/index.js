@@ -1,8 +1,9 @@
 import fs from 'fs';
 import OpenAI from 'openai';
+import { OPENAI_API_KEY } from './key.js';
 
 const client = new OpenAI({
-    apiKey: process.env['OPENAI_API_KEY']
+    apiKey: OPENAI_API_KEY
 });
 
 async function genImage(imagePath) {
