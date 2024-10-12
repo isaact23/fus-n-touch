@@ -19,7 +19,7 @@ function App() {
 
     const newTimeoutId = setTimeout(() => {
       saveImage(); // Save image after 10s of inactivity
-    }, 10000);
+    }, 5000);
 
     setTimeoutId(newTimeoutId); // Store timeout ID
   };
