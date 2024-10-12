@@ -1,4 +1,3 @@
-import fs from 'fs';
 import OpenAI from 'openai';
 import { OPENAI_API_KEY } from './key.js';
 
