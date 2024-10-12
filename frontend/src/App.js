@@ -2,6 +2,7 @@ import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
 import { useState, useRef } from 'react';
+import genImage from 'openai';
 
 function App() {
   const [color, setColor] = useState("pink");
@@ -26,6 +27,9 @@ function App() {
     try {
       const base64Image = await canvasRef.current.exportImage('png'); // Get base64 image
       console.log('Saved Base64 Image:', base64Image);
+      genImage(base64Image).then(url=>{
+        console.log(url);
+      })
     } catch (error) {
       console.error('Error exporting image:', error);
     }

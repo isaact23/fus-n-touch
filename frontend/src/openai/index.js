@@ -6,8 +6,7 @@ const client = new OpenAI({
     apiKey: OPENAI_API_KEY
 });
 
-async function genImage(imagePath) {
-    const image = fs.readFileSync(imagePath, 'base64');
+async function genImage(image) {
 
     const chatResponse = await client.chat.completions.create({
         model: "gpt-4o-mini",
@@ -38,7 +37,3 @@ async function genImage(imagePath) {
     return imageUrl
 }
 
-genImage("/home/shuffles/Repos/fus-n-touch/example_input/tree.jpg")
-    .then(url => {
-        console.log(url)
-    })
