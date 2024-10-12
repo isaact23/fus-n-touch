@@ -25,7 +25,7 @@ async function genImage(image, isCyberpunk) {
         messages: [{
             role: "user",
             content: [
-                { type: "text", text: `Identify the subject of the drawing and generate a brief prompt to generate a realistic image of the subject ${theme}.` },
+                { type: "text", text: `Write a brief prompt to generate an artistic wall pattern from the image ${theme}.` },
                 {
                     type: "image_url",
                     image_url: {
