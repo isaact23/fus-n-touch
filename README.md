@@ -1,1 +1,1 @@
-# Fusion Touch (owtte)
+# Fusion Touch (fus-n-touch) (owtte)
