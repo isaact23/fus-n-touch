@@ -25,7 +25,7 @@ async function genImage(image) {
         messages: [{
             role: "user",
             content: [
-                {type: "text", text: "Identify the drawing. Imagine a realistic cyberpunk rendition of that object, and generate a brief prompt to generate this image."},
+                {type: "text", text: "Identify the subject of the drawing and generate a brief prompt to generate an interesting wall pattern."},
                 {
                     type: "image_url",
                     image_url: {
