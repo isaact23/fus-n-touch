@@ -5,12 +5,16 @@ import { useState, useRef } from 'react';
 
 function App() {
   const [color, setColor] = useState("pink");
+
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
+  const [isCyberpunk, setIsCyberpunk] = useState(false); // State for cyberpunk theme
   const [strokeWidth, setStrokeWidth] = useState(4); // Track stroke width
-  const [timeoutId, setTimeoutId] = useState(null); // Track the timeout
   const canvasRef = useRef(); // Create a ref to access the canvas instance
 
+
   const handleColorChange = (colorObj) => {
-    setColor(colorObj.hex); // Extract hex value from the color object
+    setColor(colorObj.hex);
   };
 
   const handleStrokeWidthChange = (event) => {
@@ -18,13 +22,13 @@ function App() {
   };
 
   const handleStroke = () => {
-    if (timeoutId) clearTimeout(timeoutId); // Clear previous timeout
+    if (timeoutId) clearTimeout(timeoutId);
 
     const newTimeoutId = setTimeout(() => {
-      saveImage(); // Save image after 10s of inactivity
-    }, 10000);
+      saveImage();
+    }, 5000);
 
-    setTimeoutId(newTimeoutId); // Store timeout ID
+    setTimeoutId(newTimeoutId);
   };
 
   const saveImage = async () => {
@@ -34,10 +38,29 @@ function App() {
     } catch (error) {
       console.error('Error exporting image:', error);
     }
+
+    analyzeImage(base64Image, isCyberpunk) // Pass cyberpunk state as argument
+      .then(result => {
+        console.log('Generated Image URL:', result.url);
+        console.log('Fun Fact:', result.fact);
+        setGeneratedImageUrl(result.url);
+      })
+      .catch(err => {
+        console.error('Error generating image:', err);
+      });
   };
 
   const handleErase = () => {
-    canvasRef.current.clearCanvas(); // Clear the canvas
+    canvasRef.current.clearCanvas();
+  };
+
+  const handleBackToCanvas = () => {
+    setGeneratedImageUrl(null);
+  };
+
+  const toggleCyberpunk = () => {
+    setIsCyberpunk(!isCyberpunk); // Toggle cyberpunk theme
+
   };
 
   return (
@@ -65,10 +88,39 @@ function App() {
           <option value={12}>Extra Thick (12px)</option>
         </select>
 
-        <button className="Erase-Button" onClick={handleErase}>
-          Erase Canvas
-        </button>
-      </div>
+      {generatedImageUrl ? (
+        <>
+          <img src={generatedImageUrl} alt="Generated" className="generated-image" />
+          <button className="back-button" onClick={handleBackToCanvas}>
+            Back to Sketch Canvas
+          </button>
+        </>
+      ) : (
+        <>
+          <ReactSketchCanvas
+            ref={canvasRef}
+            width="100%"
+            height="500px"
+            strokeWidth={4}
+            strokeColor={color}
+            onStroke={handleStroke}
+          />
+          <div className="controls">
+            <CompactPicker color={color} onChange={handleColorChange} />
+            <button className="Erase-Button" onClick={handleErase}>
+              Erase Canvas
+            </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={isCyberpunk}
+                onChange={toggleCyberpunk}
+              />
+              Cyberpunk Theme
+            </label>
+          </div>
+        </>
+      )}
     </div>
   );
 }
