@@ -2,7 +2,7 @@ import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
 import { useState, useRef } from 'react';
-import { genImage } from './image-gen';
+import { analyzeImage } from './image-gen';
 
 function App() {
   const [color, setColor] = useState("pink");
@@ -33,9 +33,11 @@ function App() {
     }
 
     //console.log('Saved Base64 Image:', base64Image);
-    genImage(base64Image)
-      .then(url=>{
-        console.log(url);
+
+    analyzeImage(base64Image)
+      .then(result=>{
+        console.log(result.url)
+        console.log(result.fact)
       })
       .catch(err=>{
         console.error('Error generating image:', err)
