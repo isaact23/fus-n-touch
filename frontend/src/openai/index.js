@@ -5,26 +5,15 @@ const client = new OpenAI({
     apiKey: process.env['OPENAI_API_KEY']
 });
 
-async function chatTest() {
-    const chatCompletion = await client.chat.completions.create({
-        messages: [{role: 'user', content: "What is the derivative of ln(x)"}],
-        model: 'gpt-3.5-turbo'
-    });
-
-    console.log(chatCompletion.choices[0].message.content);
-}
-
 async function genImage(imagePath) {
-    const image = fs.readFileSync("/home/shuffles/Repos/fus-n-touch/example_input/house.png", 'base64');
-
-    console.log("data:image/png;base64," + image)
+    const image = fs.readFileSync(imagePath, 'base64');
 
     const chatResponse = await client.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{
             role: "user",
             content: [
-                {type: "text", text: "Identify and describe this drawing."},
+                {type: "text", text: "Identify the drawing. Imagine the image professionally drawn with colored pencils and generate a brief prompt to generate this image."},
                 {
                     type: "image_url",
                     image_url: {
@@ -33,9 +22,22 @@ async function genImage(imagePath) {
                 }
             ]
         }]
-    });
+    })
 
-    console.log(chatResponse.choices[0].message.content);
+    const prompt = chatResponse.choices[0].message.content
+
+    const newImage = await client.images.generate({
+        model: 'dall-e-3',
+        prompt: prompt,
+        n: 1,
+        size: '1024x1024'
+    })
+
+    const imageUrl = newImage.data[0].url
+    return imageUrl
 }
 
-genImage();
+genImage("/home/shuffles/Repos/fus-n-touch/example_input/tree.jpg")
+    .then(url => {
+        console.log(url)
+    })
