@@ -1,19 +1,31 @@
 import { OpenAI } from 'openai';
 import { OPENAI_API_KEY } from './key.js';
 
-export async function genImage(image) {
+const client = new OpenAI({
+    apiKey: OPENAI_API_KEY,
+    dangerouslyAllowBrowser: true
+});
 
-    const client = new OpenAI({
-        apiKey: OPENAI_API_KEY,
-        dangerouslyAllowBrowser: true
-    });
+export async function analyzeImage(image) {
 
+    const newImg = genImage(image)
+    const funFact = getFunFact(image)
+
+    const results = await Promise.all([newImg, funFact])
+
+    return {
+        url: results[0],
+        fact: results[1]
+    }
+}
+
+async function genImage(image) {
     const chatResponse = await client.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{
             role: "user",
             content: [
-                {type: "text", text: "Identify the drawing. Imagine the image professionally drawn with colored pencils and generate a brief prompt to generate this image."},
+                {type: "text", text: "Identify the subject of the drawing and generate a brief prompt to generate an interesting wall pattern."},
                 {
                     type: "image_url",
                     image_url: {
@@ -37,3 +49,22 @@ export async function genImage(image) {
     return imageUrl
 }
 
+async function getFunFact(image) {
+    const chatResponse = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{
+            role: "user",
+            content: [
+                {type: "text", text: "Identify the drawing and get a fun fact about it in under 10 words."},
+                {
+                    type: "image_url",
+                    image_url: {
+                        url: image
+                    }
+                }
+            ]
+        }]
+    })
+
+    return chatResponse.choices[0].message.content
+}

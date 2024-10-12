@@ -2,7 +2,7 @@ import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
 import { useState, useRef } from 'react';
-import { genImage } from './image-gen';
+import { analyzeImage } from './image-gen';
 
 function App() {
   const [color, setColor] = useState("pink");
@@ -19,7 +19,7 @@ function App() {
 
     const newTimeoutId = setTimeout(() => {
       saveImage(); // Save image after 10s of inactivity
-    }, 10000);
+    }, 5000);
 
     setTimeoutId(newTimeoutId); // Store timeout ID
   };
@@ -33,10 +33,11 @@ function App() {
       return;
     }
 
-    genImage(base64Image)
-      .then(url => {
-        console.log('Generated Image URL:', url);
-        setGeneratedImageUrl(url); // Set the generated image URL
+    analyzeImage(base64Image)
+      .then(result => {
+        console.log('Generated Image URL:', result.url);
+        console.log('Fun Fact:', result.fact)
+        setGeneratedImageUrl(result.url); // Set the generated image URL
       })
       .catch(err => {
         console.error('Error generating image:', err);
