@@ -6,38 +6,39 @@ import { analyzeImage } from './image-gen';
 
 function App() {
   const [color, setColor] = useState("pink");
-  const [timeoutId, setTimeoutId] = useState(null); // Track the timeout
-  const [generatedImageUrl, setGeneratedImageUrl] = useState(null); // State to store the generated image URL
-  const canvasRef = useRef(); // Ref for the sketch canvas
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
+  const [isCyberpunk, setIsCyberpunk] = useState(false); // State for cyberpunk theme
+  const canvasRef = useRef();
 
   const handleColorChange = (colorObj) => {
-    setColor(colorObj.hex); // Extract hex value from the color object
+    setColor(colorObj.hex);
   };
 
   const handleStroke = () => {
-    if (timeoutId) clearTimeout(timeoutId); // Clear previous timeout
+    if (timeoutId) clearTimeout(timeoutId);
 
     const newTimeoutId = setTimeout(() => {
-      saveImage(); // Save image after 10s of inactivity
+      saveImage();
     }, 5000);
 
-    setTimeoutId(newTimeoutId); // Store timeout ID
+    setTimeoutId(newTimeoutId);
   };
 
   const saveImage = async () => {
     let base64Image = null;
     try {
-      base64Image = await canvasRef.current.exportImage('png'); // Get base64 image
+      base64Image = await canvasRef.current.exportImage('png');
     } catch (error) {
       console.error('Error exporting image:', error);
       return;
     }
 
-    analyzeImage(base64Image)
+    analyzeImage(base64Image, isCyberpunk) // Pass cyberpunk state as argument
       .then(result => {
         console.log('Generated Image URL:', result.url);
-        console.log('Fun Fact:', result.fact)
-        setGeneratedImageUrl(result.url); // Set the generated image URL
+        console.log('Fun Fact:', result.fact);
+        setGeneratedImageUrl(result.url);
       })
       .catch(err => {
         console.error('Error generating image:', err);
@@ -45,11 +46,15 @@ function App() {
   };
 
   const handleErase = () => {
-    canvasRef.current.clearCanvas(); // Clear the sketch canvas
+    canvasRef.current.clearCanvas();
   };
 
   const handleBackToCanvas = () => {
-    setGeneratedImageUrl(null); // Reset the image URL to go back to the sketch canvas
+    setGeneratedImageUrl(null);
+  };
+
+  const toggleCyberpunk = () => {
+    setIsCyberpunk(!isCyberpunk); // Toggle cyberpunk theme
   };
 
   return (
@@ -58,16 +63,13 @@ function App() {
 
       {generatedImageUrl ? (
         <>
-          {/* Render the image if the URL is generated */}
           <img src={generatedImageUrl} alt="Generated" className="generated-image" />
-          {/* Button to go back to the sketch canvas */}
           <button className="back-button" onClick={handleBackToCanvas}>
             Back to Sketch Canvas
           </button>
         </>
       ) : (
         <>
-          {/* Render the sketch canvas if the image has not been generated */}
           <ReactSketchCanvas
             ref={canvasRef}
             width="100%"
@@ -81,6 +83,14 @@ function App() {
             <button className="Erase-Button" onClick={handleErase}>
               Erase Canvas
             </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={isCyberpunk}
+                onChange={toggleCyberpunk}
+              />
+              Cyberpunk Theme
+            </label>
           </div>
         </>
       )}
