@@ -2,6 +2,7 @@ import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
 import { useState, useRef } from 'react';
+import { analyzeImage } from './image-gen';
 
 function App() {
   const [color, setColor] = useState("pink");
@@ -32,6 +33,7 @@ function App() {
   };
 
   const saveImage = async () => {
+    let base64Image = null;
     try {
       const base64Image = await canvasRef.current.exportImage('png'); // Get base64 image
       console.log('Saved Base64 Image:', base64Image);
@@ -121,6 +123,7 @@ function App() {
           </div>
         </>
       )}
+    </div>
     </div>
   );
 }
