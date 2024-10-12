@@ -1,11 +1,12 @@
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 import { OPENAI_API_KEY } from './key.js';
 
-const client = new OpenAI({
-    apiKey: OPENAI_API_KEY
-});
+export async function genImage(image) {
 
-async function genImage(image) {
+    const client = new OpenAI({
+        apiKey: OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true
+    });
 
     const chatResponse = await client.chat.completions.create({
         model: "gpt-4o-mini",
@@ -16,7 +17,7 @@ async function genImage(image) {
                 {
                     type: "image_url",
                     image_url: {
-                        url: "data:image/png;base64," + image
+                        url: image
                     }
                 }
             ]

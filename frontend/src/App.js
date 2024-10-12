@@ -2,7 +2,7 @@ import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
 import { useState, useRef } from 'react';
-import genImage from 'openai';
+import { genImage } from './image-gen';
 
 function App() {
   const [color, setColor] = useState("pink");
@@ -24,15 +24,22 @@ function App() {
   };
 
   const saveImage = async () => {
+    let base64Image = null
     try {
-      const base64Image = await canvasRef.current.exportImage('png'); // Get base64 image
-      console.log('Saved Base64 Image:', base64Image);
-      genImage(base64Image).then(url=>{
-        console.log(url);
-      })
+      base64Image = await canvasRef.current.exportImage('png'); // Get base64 image
     } catch (error) {
       console.error('Error exporting image:', error);
+      return
     }
+
+    //console.log('Saved Base64 Image:', base64Image);
+    genImage(base64Image)
+      .then(url=>{
+        console.log(url);
+      })
+      .catch(err=>{
+        console.error('Error generating image:', err)
+      })
   };
 
   const handleErase = () => {
