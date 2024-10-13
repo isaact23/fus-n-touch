@@ -1,10 +1,33 @@
-import { OpenAI } from 'openai';
-import { OPENAI_API_KEY } from './key.js';
+import fs from 'fs'
 
-const client = new OpenAI({
-    apiKey: OPENAI_API_KEY,
-    dangerouslyAllowBrowser: true
-});
+import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity"
+import { AzureOpenAI } from "@azure/openai"
+
+const ENDPOINT_DALLE = 'https://gamma-fish.openai.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01'
+const ENDPOINT_CHAT = 'https://gamma-fish.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview'
+
+
+const credential = new DefaultAzureCredential()
+const scope = "https://openai.azure.com/.default"
+const azureADTokenProvider = getBearerTokenProvider(credential, scope);
+
+const deployment1 = "dall-e-3"
+const v1 = "2024-02-01"
+const client1 = new AzureOpenAI({
+    endpoint: ENDPOINT_DALLE,
+    deployment: deployment1,
+    apiVersion: v1,
+    azureADTokenProvider: azureADTokenProvider
+})
+
+const deployment2 = "gpt-4o"
+const v2 = "2024-08-01-preview"
+const client2 = new AzureOpenAI({
+    endpoint: ENDPOINT_CHAT,
+    deployment: deployment2,
+    apiVersion: v2,
+    azureADTokenProvider: azureADTokenProvider
+})
 
 export async function analyzeImage(image, isCyberpunk) {
     const newImg = genImage(image, isCyberpunk);
@@ -20,8 +43,8 @@ export async function analyzeImage(image, isCyberpunk) {
 
 async function genImage(image, isCyberpunk) {
     const theme = isCyberpunk ? " with a cyberpunk theme" : "";
-    const chatResponse = await client.chat.completions.create({
-        model: "gpt-4o-mini",
+    const completion = client2.chat.completions.create({
+        model: "gpt-4o",
         messages: [{
             role: "user",
             content: [
@@ -35,10 +58,11 @@ async function genImage(image, isCyberpunk) {
             ]
         }]
     });
+    const chatResponse = await completion;
 
     const prompt = chatResponse.choices[0].message.content;
 
-    const newImage = await client.images.generate({
+    const newImage = await client1.images.generate({
         model: 'dall-e-3',
         prompt: prompt,
         n: 1,
@@ -50,8 +74,8 @@ async function genImage(image, isCyberpunk) {
 }
 
 async function getFunFact(image) {
-    const chatResponse = await client.chat.completions.create({
-        model: "gpt-4o-mini",
+    const chatResponse = await client1.chat.completions.create({
+        model: "gpt-4o",
         messages: [{
             role: "user",
             content: [
@@ -68,3 +92,14 @@ async function getFunFact(image) {
 
     return chatResponse.choices[0].message.content;
 }
+
+let img = fs.readFileSync('/home/shuffles/Repos/fus-n-touch/example_input/house.png', 'base64')
+img = 'data:image/png;base64,' + img
+analyzeImage(img)
+    .then(res => {
+        console.log(res.fact)
+        console.log(res.url)
+    })
+    .catch(e => {
+        console.error(e)
+    })
