@@ -1,15 +1,8 @@
-import fs from 'fs'
-
 import { KEY_DALLE, KEY_CHAT } from './key.js'
-import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity"
 import { AzureOpenAI } from "openai"
 
 const ENDPOINT_DALLE = 'https://gamma-fish.openai.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01'
 const ENDPOINT_CHAT = 'https://gamma-fish.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview'
-
-//const credential = new DefaultAzureCredential()
-//const scope = "https://openai.azure.com/.default"
-//const azureADTokenProvider = getBearerTokenProvider(credential, scope);
 
 const deployment1 = "dall-e-3"
 const v1 = "2024-02-01"
@@ -17,7 +10,8 @@ const client1 = new AzureOpenAI({
     endpoint: ENDPOINT_DALLE,
     deployment: deployment1,
     apiVersion: v1,
-    apiKey: KEY_DALLE
+    apiKey: KEY_DALLE,
+    dangerouslyAllowBrowser: true
 })
 
 const deployment2 = "gpt-4o"
@@ -26,7 +20,8 @@ const client2 = new AzureOpenAI({
     endpoint: ENDPOINT_CHAT,
     deployment: deployment2,
     apiVersion: v2,
-    apiKey: KEY_CHAT
+    apiKey: KEY_CHAT,
+    dangerouslyAllowBrowser: true
 })
 
 export async function analyzeImage(image, isCyberpunk) {
@@ -48,7 +43,7 @@ async function genImage(image, isCyberpunk) {
         messages: [{
             role: "user",
             content: [
-                { type: "text", text: `Identify the subject of the drawing and write a brief prompt to generate a geometric image of the subject${theme}.` },
+                { type: "text", text: `Identify the drawing, and describe how to re-create a high fidelity version of the drawing ${theme} - make sure the description is truly representative of the input image.` },
                 {
                     type: "image_url",
                     image_url: {
@@ -92,14 +87,3 @@ async function getFunFact(image) {
 
     return chatResponse.choices[0].message.content;
 }
-
-let img = fs.readFileSync('/home/shuffles/Repos/fus-n-touch/example_input/house.png', 'base64')
-img = 'data:image/png;base64,' + img
-analyzeImage(img)
-    .then(res => {
-        console.log(res.fact)
-        console.log(res.url)
-    })
-    .catch(e => {
-        console.error(e)
-    })
