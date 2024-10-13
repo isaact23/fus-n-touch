@@ -43,7 +43,7 @@ async function genImage(image, isCyberpunk) {
         messages: [{
             role: "user",
             content: [
-                { type: "text", text: `Identify the drawing, and describe how to re-create a high fidelity version of the drawing ${theme} - make sure the description is truly representative of the input image.` },
+                { type: "text", text: `Identify the drawing, and describe how to re-create a high fidelity version of the drawing ${theme} ` },
                 {
                     type: "image_url",
                     image_url: {
