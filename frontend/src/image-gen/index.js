@@ -61,7 +61,7 @@ async function genImage(image, isCyberpunk) {
         model: 'dall-e-3',
         prompt: prompt,
         n: 1,
-        size: '1024x1024'
+        size: '1792x1024'
     });
 
     const imageUrl = newImage.data[0].url;

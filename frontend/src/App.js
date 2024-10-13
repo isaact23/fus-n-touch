@@ -71,11 +71,10 @@ function App() {
 
   return (
     <div className="App-header">
-      <h1>Fuse-N-Touch</h1>
       {generatedImageUrl ? (
         <>
-          <img src={generatedImageUrl} alt="Generated" className="generated-image" />
-          <button className="back-button" onClick={handleBackToCanvas}>
+          <img src={generatedImageUrl} alt="Generated" className="Generated-Image" />
+          <button className="Back-Button" onClick={handleBackToCanvas}>
             Back to Sketch Canvas
           </button>
         </>
@@ -84,7 +83,7 @@ function App() {
           <ReactSketchCanvas
             ref={canvasRef}
             width="100%"
-            height="500px"
+            height="800px"
             strokeWidth={strokeWidth}
             strokeColor={color}
             onStroke={handleStroke}
