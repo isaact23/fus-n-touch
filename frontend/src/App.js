@@ -11,6 +11,7 @@ function App() {
   const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [isGenerating, setIsGenerating] = useState(false);  // New state to track image generation
+  const [funFact, setFunFact] = useState('')
   const canvasRef = useRef();
 
   const handleColorChange = (colorObj) => {
@@ -38,7 +39,7 @@ function App() {
     let base64Image = null;
     try {
       base64Image = await canvasRef.current.exportImage('png');
-      console.log('Saved Base64 Image:', base64Image);
+      //console.log('Saved Base64 Image:', base64Image);
     } catch (error) {
       console.error('Error exporting image:', error);
     }
@@ -48,6 +49,7 @@ function App() {
         console.log('Generated Image URL:', result.url);
         console.log('Fun Fact:', result.fact);
         setGeneratedImageUrl(result.url);
+        setFunFact(result.fact)
       })
       .catch(err => {
         console.error('Error generating image:', err);
@@ -74,6 +76,7 @@ function App() {
       {generatedImageUrl ? (
         <>
           <img src={generatedImageUrl} alt="Generated" className="Generated-Image" />
+          <p>{funFact}</p>
           <button className="Back-Button" onClick={handleBackToCanvas}>
             Back to Sketch Canvas
           </button>

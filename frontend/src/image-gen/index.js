@@ -1,4 +1,4 @@
-import { KEY_DALLE, KEY_CHAT } from './key.js'
+import { AZURE_KEY } from './key.js'
 import { AzureOpenAI } from "openai"
 
 const ENDPOINT_DALLE = 'https://gamma-fish.openai.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01'
@@ -10,7 +10,7 @@ const client1 = new AzureOpenAI({
     endpoint: ENDPOINT_DALLE,
     deployment: deployment1,
     apiVersion: v1,
-    apiKey: KEY_DALLE,
+    apiKey: AZURE_KEY,
     dangerouslyAllowBrowser: true
 })
 
@@ -20,7 +20,7 @@ const client2 = new AzureOpenAI({
     endpoint: ENDPOINT_CHAT,
     deployment: deployment2,
     apiVersion: v2,
-    apiKey: KEY_CHAT,
+    apiKey: AZURE_KEY,
     dangerouslyAllowBrowser: true
 })
 
@@ -74,7 +74,7 @@ async function getFunFact(image) {
         messages: [{
             role: "user",
             content: [
-                { type: "text", text: "Identify the drawing and get a fun fact about it in under 10 words." },
+                { type: "text", text: "Identify the drawing. Return an obscure fun fact about this drawing." },
                 {
                     type: "image_url",
                     image_url: {
