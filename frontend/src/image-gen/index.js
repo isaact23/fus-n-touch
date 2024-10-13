@@ -1,15 +1,15 @@
 import fs from 'fs'
 
+import { KEY_DALLE, KEY_CHAT } from './key.js'
 import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity"
-import { AzureOpenAI } from "@azure/openai"
+import { AzureOpenAI } from "openai"
 
 const ENDPOINT_DALLE = 'https://gamma-fish.openai.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01'
 const ENDPOINT_CHAT = 'https://gamma-fish.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview'
 
-
-const credential = new DefaultAzureCredential()
-const scope = "https://openai.azure.com/.default"
-const azureADTokenProvider = getBearerTokenProvider(credential, scope);
+//const credential = new DefaultAzureCredential()
+//const scope = "https://openai.azure.com/.default"
+//const azureADTokenProvider = getBearerTokenProvider(credential, scope);
 
 const deployment1 = "dall-e-3"
 const v1 = "2024-02-01"
@@ -17,7 +17,7 @@ const client1 = new AzureOpenAI({
     endpoint: ENDPOINT_DALLE,
     deployment: deployment1,
     apiVersion: v1,
-    azureADTokenProvider: azureADTokenProvider
+    apiKey: KEY_DALLE
 })
 
 const deployment2 = "gpt-4o"
@@ -26,7 +26,7 @@ const client2 = new AzureOpenAI({
     endpoint: ENDPOINT_CHAT,
     deployment: deployment2,
     apiVersion: v2,
-    azureADTokenProvider: azureADTokenProvider
+    apiKey: KEY_CHAT
 })
 
 export async function analyzeImage(image, isCyberpunk) {
@@ -74,7 +74,7 @@ async function genImage(image, isCyberpunk) {
 }
 
 async function getFunFact(image) {
-    const chatResponse = await client1.chat.completions.create({
+    const chatResponse = await client2.chat.completions.create({
         model: "gpt-4o",
         messages: [{
             role: "user",
