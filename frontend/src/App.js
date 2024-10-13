@@ -10,6 +10,7 @@ function App() {
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
   const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(4);
+  const [isGenerating, setIsGenerating] = useState(false);  // New state to track image generation
   const canvasRef = useRef();
 
   const handleColorChange = (colorObj) => {
@@ -31,6 +32,9 @@ function App() {
   };
 
   const saveImage = async () => {
+    if (isGenerating) return; // Prevent multiple calls while generating
+    setIsGenerating(true);    // Set generating flag to true
+
     let base64Image = null;
     try {
       base64Image = await canvasRef.current.exportImage('png');
@@ -47,6 +51,9 @@ function App() {
       })
       .catch(err => {
         console.error('Error generating image:', err);
+      })
+      .finally(() => {
+        setIsGenerating(false); // Reset generating flag after completion
       });
   };
 
@@ -115,4 +122,3 @@ function App() {
 }
 
 export default App;
-
