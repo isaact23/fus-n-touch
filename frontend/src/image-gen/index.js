@@ -38,7 +38,9 @@ export async function analyzeImage(image, isCyberpunk) {
 
 async function genImage(image, isCyberpunk) {
     const theme = isCyberpunk ? " with a cyberpunk theme" : "";
-    const completion = client2.chat.completions.create({
+
+    console.time('identify')
+    const chatResponse = await client2.chat.completions.create({
         model: "gpt-4o",
         messages: [{
             role: "user",
@@ -53,22 +55,26 @@ async function genImage(image, isCyberpunk) {
             ]
         }]
     });
-    const chatResponse = await completion;
+    console.timeEnd('identify')
 
     const prompt = chatResponse.choices[0].message.content;
 
+    console.time('imageGen')
     const newImage = await client1.images.generate({
-        model: 'dall-e-3',
+        model: 'dall-e-2',
         prompt: prompt,
         n: 1,
-        size: '1792x1024'
+        size: '512x512'
     });
+
+    console.timeEnd('imageGen')
 
     const imageUrl = newImage.data[0].url;
     return imageUrl;
 }
 
 async function getFunFact(image) {
+    console.time('fun')
     const chatResponse = await client2.chat.completions.create({
         model: "gpt-4o",
         messages: [{
@@ -84,6 +90,8 @@ async function getFunFact(image) {
             ]
         }]
     });
+
+    console.timeEnd('fun')
 
     return chatResponse.choices[0].message.content;
 }
