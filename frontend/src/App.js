@@ -1,7 +1,7 @@
 import './App.css';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { CompactPicker } from 'react-color';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { analyzeImage } from './image-gen';
 
 function App() {
@@ -10,9 +10,19 @@ function App() {
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
   const [isCyberpunk, setIsCyberpunk] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(4);
-  const [isGenerating, setIsGenerating] = useState(false);  // New state to track image generation
-  const [funFact, setFunFact] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false);  // Tracks image generation
+  const [funFact, setFunFact] = useState('');
+  const [countdown, setCountdown] = useState(0);            // Countdown for stroke timer
   const canvasRef = useRef();
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timerId = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timerId);
+    }
+  }, [countdown]);
 
   const handleColorChange = (colorObj) => {
     setColor(colorObj.hex);
@@ -24,6 +34,8 @@ function App() {
 
   const handleStroke = () => {
     if (timeoutId) clearTimeout(timeoutId);
+
+    setCountdown(5); // Start countdown from 5 seconds
 
     const newTimeoutId = setTimeout(() => {
       saveImage();
@@ -39,7 +51,6 @@ function App() {
     let base64Image = null;
     try {
       base64Image = await canvasRef.current.exportImage('png');
-      //console.log('Saved Base64 Image:', base64Image);
     } catch (error) {
       console.error('Error exporting image:', error);
     }
@@ -49,18 +60,21 @@ function App() {
         console.log('Generated Image URL:', result.url);
         console.log('Fun Fact:', result.fact);
         setGeneratedImageUrl(result.url);
-        setFunFact(result.fact)
+        setFunFact(result.fact);
       })
       .catch(err => {
         console.error('Error generating image:', err);
       })
       .finally(() => {
         setIsGenerating(false); // Reset generating flag after completion
+        setCountdown(0);        // Clear the countdown after generation
       });
   };
 
   const handleErase = () => {
     canvasRef.current.clearCanvas();
+    if (timeoutId) clearTimeout(timeoutId);
+    setCountdown(0); // Reset the countdown if the canvas is cleared
   };
 
   const handleBackToCanvas = () => {
@@ -116,7 +130,16 @@ function App() {
               />
               Cyberpunk Theme
             </label>
+            <div className="timer">
+              {countdown > 0 && <p>Saving image in {countdown} seconds...</p>}
+            </div>
           </div>
+
+          {isGenerating && (
+            <div className="generating">
+              <p>Generating Image...</p>
+            </div>
+          )}
         </>
       )}
     </div>
